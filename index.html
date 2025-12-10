@@ -124,6 +124,14 @@
       color: var(--text-muted);
     }
 
+    /* Etiquetas */
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 2px;
+      color: var(--text-main);
+    }
+
     /* Inputs */
     .inputs {
       display: grid;
@@ -254,7 +262,7 @@
 <body class="dark">
 <div class="calculator">
 
-  <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">☾</button>
+  <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">☀︎</button>
 
   <!-- Pantalla -->
   <div class="screen">
@@ -330,22 +338,26 @@
   const themeToggle    = document.getElementById("themeToggle");
   const body           = document.body;
 
-  // Tema claro/oscuro con persistencia sencilla
+  // Tema claro/oscuro con icono como ACCIÓN (lo que va a pasar al pulsar)
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
     body.classList.remove("dark");
     body.classList.add("light");
-    themeToggle.textContent = "☀︎";
+    themeToggle.textContent = "☾"; // al pulsar, pasas a oscuro
+  } else {
+    body.classList.remove("light");
+    body.classList.add("dark");
+    themeToggle.textContent = "☀︎"; // al pulsar, pasas a claro
   }
 
   themeToggle.addEventListener("click", () => {
     if (body.classList.contains("dark")) {
       body.classList.remove("dark");
       body.classList.add("light");
-      themeToggle.textContent = "☀︎";
+      themeToggle.textContent = "☾";
     } else {
       body.classList.remove("light");
       body.classList.add("dark");
-      themeToggle.textContent = "☾";
+      themeToggle.textContent = "☀︎";
     }
   });
 
