@@ -466,10 +466,9 @@
     const iva  = toNumber(ivaTrabajo.value);
     const irpf = toNumber(irpfTrabajo.value);
 
-    const ivaFactura = base * (iva / 100);
-    const irpfFactura = base * (irpf / 100);
-
-    const ingresosBrutos = base + ivaFactura - irpfFactura;
+    const ivaFactura   = base * (iva / 100);
+    const irpfFactura  = base * (irpf / 100);
+    const totalFactura = base + ivaFactura - irpfFactura; // lo que cobras
 
     let gastos = 0;
     let ivaGastos = 0;
@@ -481,10 +480,10 @@
       ivaGastos+= ivaG;
     });
 
+    const ingresosBrutos = totalFactura;
     const beneficioBruto = ingresosBrutos;
     const beneficioNeto  = ingresosBrutos - gastos;
 
-    // IVA a ingresar: IVA factura - IVA soportado (si sale negativo, 0)
     let ivaHacienda = ivaFactura - ivaGastos;
     if (ivaHacienda < 0) ivaHacienda = 0;
     const totalHacienda = ivaHacienda + irpfFactura;
@@ -495,13 +494,13 @@
       "Beneficio bruto: " + euro(beneficioBruto) +
       "\nGastos totales: " + euro(gastos);
 
-    resBruto.textContent        = euro(beneficioBruto);
-    resNeto.textContent         = euro(beneficioNeto);
-    resIvaFactura.textContent   = euro(ivaFactura);
-    resIvaGastos.textContent    = euro(ivaGastos);
-    resIvaHacienda.textContent  = euro(ivaHacienda);
-    resIrpfFactura.textContent  = euro(irpfFactura);
-    resTotalHacienda.textContent= euro(totalHacienda);
+    resBruto.textContent         = euro(beneficioBruto);
+    resNeto.textContent          = euro(beneficioNeto);
+    resIvaFactura.textContent    = euro(ivaFactura);
+    resIvaGastos.textContent     = euro(ivaGastos);
+    resIvaHacienda.textContent   = euro(ivaHacienda);
+    resIrpfFactura.textContent   = euro(irpfFactura);
+    resTotalHacienda.textContent = euro(totalHacienda);
   }
 
   btnCalcular.addEventListener("click", calcular);
@@ -528,23 +527,28 @@
     resTotalHacienda.textContent = "0,00 €";
   });
 
-  // Botón WhatsApp: abre conversación con texto del resumen
+  // Botón WhatsApp: solo resumen de factura y Hacienda
   btnWhatsapp.addEventListener("click", () => {
-    const texto = `
-Resumen factura autónomos
+    const base = toNumber(baseTrabajo.value);
+    const iva  = toNumber(ivaTrabajo.value);
+    const irpf = toNumber(irpfTrabajo.value);
 
-Base trabajo: ${baseTrabajo.value || "0"}
+    const ivaFactura   = base * (iva / 100);
+    const irpfFactura  = base * (irpf / 100);
+    const totalFactura = base + ivaFactura - irpfFactura;
+
+    const texto = `
+Resumen Factura
+
+Base Trabajo: ${euro(base)}
 IVA (%): ${ivaTrabajo.value || "0"}
 IRPF (%): ${irpfTrabajo.value || "0"}
+Total Importe Factura: ${euro(totalFactura)}
 
-Beneficio BRUTO (sin gastos): ${resBruto.textContent}
-Beneficio NETO (tras gastos): ${resNeto.textContent}
-
-IVA factura: ${resIvaFactura.textContent}
-IVA gastos deducible: ${resIvaGastos.textContent}
-IVA a ingresar en Hacienda: ${resIvaHacienda.textContent}
-IRPF retenido en factura: ${resIrpfFactura.textContent}
-Total que va a Hacienda: ${resTotalHacienda.textContent}
+IVA Factura (€): ${euro(ivaFactura)}
+IVA a ingresar a Hacienda (€): ${resIvaHacienda.textContent}
+IRPF Retenido en Factura (€): ${euro(irpfFactura)}
+Total importe a Hacienda (€): ${resTotalHacienda.textContent}
 `.trim();
 
     const url = "https://wa.me/?text=" + encodeURIComponent(texto);
