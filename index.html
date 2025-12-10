@@ -11,8 +11,8 @@
       --text-main: #ffffff;
       --text-muted: #d4d4d4;
       --btn-light: #a5a5a5;
-      --btn-dark: #333333;
       --btn-accent: #ff9f0a;
+      --btn-danger: #ff3b30;
     }
 
     * {
@@ -23,7 +23,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #2c2c2e 0%, #000000 60%);
+      background: radial-gradient(circle at top, #2c2c2e 0%, #000 60%);
       display: flex;
       justify-content: center;
       padding: 60px 16px 20px;
@@ -35,46 +35,42 @@
       max-width: 420px;
       background: rgba(0,0,0,0.9);
       border-radius: 32px;
-      padding: 24px 16px 30px;
+      padding: 20px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255,255,255,0.06);
     }
 
     /* Pantalla */
     .screen {
       background: var(--bg-screen);
       border-radius: 24px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
     }
     .screen-title {
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
     }
     .screen-main {
       text-align: right;
       font-size: 42px;
       font-weight: bold;
       color: white;
-      margin-bottom: 8px;
+      margin-top: 6px;
     }
     .screen-sub {
       text-align: right;
+      margin-top: 6px;
       font-size: 13px;
       color: var(--text-muted);
       white-space: pre-line;
     }
 
-    /* Etiquetas */
+    /* Inputs */
     .section-title {
+      margin-top: 14px;
       font-size: 14px;
       color: var(--text-muted);
-      margin-top: 14px;
     }
-
-    /* Inputs */
     .inputs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -89,7 +85,6 @@
       grid-column: span 4;
     }
 
-    input[type="number"],
     input[type="text"] {
       padding: 10px 12px;
       border-radius: 12px;
@@ -107,17 +102,32 @@
       border-radius: 14px;
       margin-top: 10px;
     }
+
     .dynamic-gasto-title {
       color: var(--btn-accent);
-      font-size: 13px;
       margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .delete-btn {
+      width: 100%;
+      background: var(--btn-danger);
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+      text-align: center;
     }
 
     .add-btn {
       width: 100%;
       background: var(--btn-accent);
       color: black;
-      padding: 12px 0;
+      padding: 12px;
       border-radius: 14px;
       border: none;
       font-size: 16px;
@@ -129,11 +139,10 @@
     /* Botones */
     .keypad-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3,1fr);
       gap: 12px;
-      margin-top: 14px;
+      margin-top: 20px;
     }
-
     .btn {
       padding: 16px 0;
       border-radius: 999px;
@@ -161,81 +170,109 @@
     .strong span:last-child {
       font-weight: bold;
     }
+
   </style>
 </head>
 
 <body>
-  <div class="calculator">
+<div class="calculator">
 
-    <!-- Pantalla -->
-    <div class="screen">
-      <div class="screen-title">Beneficio NETO</div>
-      <div id="screenMain" class="screen-main">0,00 €</div>
-      <div id="screenSub" class="screen-sub">
-Introduce los importes para calcular el rendimiento del trabajo.
-      </div>
+  <!-- Pantalla -->
+  <div class="screen">
+    <div class="screen-title">Beneficio NETO</div>
+    <div id="screenMain" class="screen-main">0,00 €</div>
+    <div id="screenSub" class="screen-sub">
+Introduce los importes para calcular tu beneficio real.
     </div>
-
-    <!-- FACTURA -->
-    <div class="section-title">Factura emitida</div>
-
-    <div class="inputs">
-      <div class="input-block full">
-        <label>Base trabajo (€)</label>
-        <input type="text" inputmode="decimal" pattern="[0-9]*" id="baseTrabajo" placeholder="0,00" />
-      </div>
-
-      <div class="input-block">
-        <label>IVA (%)</label>
-        <input type="text" inputmode="decimal" pattern="[0-9]*" id="ivaTrabajo" placeholder="21" />
-      </div>
-
-      <div class="input-block">
-        <label>IRPF (%)</label>
-        <input type="text" inputmode="decimal" pattern="[0-9]*" id="irpfTrabajo" placeholder="15" />
-      </div>
-    </div>
-
-    <!-- GASTOS -->
-    <div class="section-title">Gastos</div>
-
-    <div id="gastosContainer"></div>
-
-    <button class="add-btn" id="addGastoBtn">+ Añadir gasto</button>
-
-    <!-- Botones -->
-    <div class="keypad-row">
-      <button class="btn btn-light" id="btnLimpiar">BORRAR</button>
-      <button class="btn btn-accent" id="btnCalcular">NETO</button>
-    </div>
-
-    <!-- Resumen -->
-    <div class="summary">
-      <div class="summary-row strong"><span>Beneficio BRUTO (sin gastos):</span> <span id="resBruto">0,00 €</span></div>
-      <div class="summary-row strong"><span>Beneficio NETO (tras gastos):</span> <span id="resNeto">0,00 €</span></div>
-    </div>
-
   </div>
 
+  <!-- FACTURA -->
+  <div class="section-title">Factura emitida</div>
+
+  <div class="inputs">
+    <div class="input-block full">
+      <label>Base trabajo (€)</label>
+      <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="baseTrabajo" placeholder="0,00">
+    </div>
+
+    <div class="input-block">
+      <label>IVA (%)</label>
+      <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="ivaTrabajo" placeholder="21">
+    </div>
+
+    <div class="input-block">
+      <label>IRPF (%)</label>
+      <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="irpfTrabajo" placeholder="15">
+    </div>
+  </div>
+
+  <!-- GASTOS -->
+  <div class="section-title">Gastos</div>
+
+  <div id="gastosContainer"></div>
+
+  <button class="add-btn" id="addGastoBtn">+ Añadir gasto</button>
+
+  <!-- BOTONES -->
+  <div class="keypad-row">
+    <button class="btn btn-light" id="btnLimpiar">BORRAR</button>
+    <button class="btn btn-accent" id="btnCalcular">NETO</button>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="summary">
+    <div class="summary-row strong">
+      <span>Beneficio BRUTO (sin gastos):</span>
+      <span id="resBruto">0,00 €</span>
+    </div>
+    <div class="summary-row strong">
+      <span>Beneficio NETO (tras gastos):</span>
+      <span id="resNeto">0,00 €</span>
+    </div>
+  </div>
+
+</div>
+
 <script>
-function toNumber(v) { return parseFloat(v.replace(",", ".")) || 0; }
-function euro(v) { return v.toLocaleString("es-ES",{minimumFractionDigits:2})+" €"; }
+
+// Bloquear letras en todos los inputs
+document.addEventListener("input", e => {
+  if (e.target.tagName === "INPUT") {
+    e.target.value = e.target.value.replace(/[^0-9.,]/g, "");
+  }
+});
+
+function toNumber(v) {
+  if (!v) return 0;
+  return parseFloat(v.replace(",", ".")) || 0;
+}
+function euro(n) {
+  return n.toLocaleString("es-ES",{minimumFractionDigits:2}) + " €";
+}
 
 let gastoIndex = 0;
 
 // Añadir gasto dinámico
 function addGasto() {
   gastoIndex++;
-
   const div = document.createElement("div");
   div.className = "dynamic-gasto";
+
   div.innerHTML = `
     <div class="dynamic-gasto-title">Gasto ${gastoIndex}</div>
     <label>Base (€)</label>
-    <input type="text" inputmode="decimal" pattern="[0-9]*" class="gasto-base" placeholder="0,00">
+    <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-base" placeholder="0,00">
+
     <label>IVA (%)</label>
-    <input type="text" inputmode="decimal" pattern="[0-9]*" class="gasto-iva" placeholder="21">
+    <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-iva" placeholder="21">
+
+    <button class="delete-btn">Eliminar gasto</button>
   `;
+
+  div.querySelector(".delete-btn").onclick = () => {
+    div.remove();
+    calcular();
+  };
 
   gastosContainer.appendChild(div);
 }
@@ -262,7 +299,7 @@ function calcular() {
   const beneficioNeto = ingresosBrutos - gastos;
 
   screenMain.textContent = euro(beneficioNeto);
-  screenSub.textContent = 
+  screenSub.textContent =
       "Beneficio bruto: " + euro(beneficioBruto) +
       "\nGastos totales: " + euro(gastos);
 
@@ -272,7 +309,7 @@ function calcular() {
 
 btnCalcular.onclick = calcular;
 
-// Reset
+// Reset total
 btnLimpiar.onclick = () => {
   baseTrabajo.value = "";
   ivaTrabajo.value = "";
@@ -283,11 +320,12 @@ btnLimpiar.onclick = () => {
   addGasto();
 
   screenMain.textContent = "0,00 €";
-  screenSub.textContent = "Introduce los importes para calcular el rendimiento del trabajo.";
+  screenSub.textContent = "Introduce los importes para calcular tu beneficio real.";
 
   resBruto.textContent = "0,00 €";
   resNeto.textContent = "0,00 €";
 };
+
 </script>
 
 </body>
