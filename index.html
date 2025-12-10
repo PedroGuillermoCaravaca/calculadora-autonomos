@@ -10,9 +10,9 @@
       --bg-screen: #1c1c1e;
       --text-main: #ffffff;
       --text-muted: #d4d4d4;
-      --bg-key-dark: #333333;
-      --bg-key-light: #a5a5a5;
-      --bg-key-accent: #ff9f0a;
+      --btn-light: #a5a5a5;
+      --btn-dark: #333333;
+      --btn-accent: #ff9f0a;
     }
 
     * {
@@ -40,31 +40,26 @@
       border: 1px solid rgba(255,255,255,0.06);
     }
 
+    /* Pantalla */
     .screen {
       background: var(--bg-screen);
       border-radius: 24px;
       padding: 18px 20px;
       margin-bottom: 18px;
-      min-height: 130px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
     }
-
     .screen-title {
       font-size: 12px;
       color: var(--text-muted);
-      text-transform: uppercase;
       margin-bottom: 6px;
+      text-transform: uppercase;
     }
-
     .screen-main {
       text-align: right;
       font-size: 42px;
-      font-weight: 600;
+      font-weight: bold;
       color: white;
+      margin-bottom: 8px;
     }
-
     .screen-sub {
       text-align: right;
       font-size: 13px;
@@ -72,33 +67,32 @@
       white-space: pre-line;
     }
 
+    /* Etiquetas */
     .section-title {
       font-size: 14px;
       color: var(--text-muted);
       margin-top: 14px;
     }
 
+    /* Inputs */
     .inputs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: 10px;
     }
-
     .input-block {
       grid-column: span 2;
       display: flex;
       flex-direction: column;
-      gap: 4px;
     }
-
     .input-block.full {
       grid-column: span 4;
     }
 
-    input[type="number"] {
-      padding: 8px 10px;
-      border-radius: 14px;
+    input[type="number"],
+    input[type="text"] {
+      padding: 10px 12px;
+      border-radius: 12px;
       border: none;
       background: #2c2c2e;
       color: white;
@@ -106,108 +100,99 @@
       text-align: right;
     }
 
+    /* Gastos dinámicos */
     .dynamic-gasto {
-      margin: 10px 0 6px 0;
-      padding: 10px;
       background: #2a2a2d;
-      border-radius: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      margin-top: 10px;
     }
-
     .dynamic-gasto-title {
+      color: var(--btn-accent);
       font-size: 13px;
       margin-bottom: 4px;
-      color: #ff9f0a;
     }
 
     .add-btn {
       width: 100%;
-      background: #ff9f0a;
+      background: var(--btn-accent);
       color: black;
-      padding: 10px 0;
-      margin-top: 6px;
+      padding: 12px 0;
       border-radius: 14px;
-      text-align: center;
-      font-weight: bold;
-      cursor: pointer;
       border: none;
       font-size: 16px;
+      font-weight: bold;
+      margin-top: 8px;
+      cursor: pointer;
     }
 
+    /* Botones */
     .keypad-row {
       display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-top: 14px;
     }
 
     .btn {
-      border: none;
-      border-radius: 999px;
       padding: 16px 0;
+      border-radius: 999px;
+      border: none;
       font-size: 20px;
-      cursor: pointer;
-      color: white;
       font-weight: bold;
+      cursor: pointer;
     }
+    .btn-light { background: var(--btn-light); color: black; }
+    .btn-accent { background: var(--btn-accent); color: black; }
 
-    .btn-light {
-      background: var(--bg-key-light);
-      color: black;
-    }
-
-    .btn-dark {
-      background: var(--bg-key-dark);
-    }
-
+    /* Resumen */
     .summary {
-      margin-top: 18px;
-      padding: 14px 16px;
       background: #1c1c1e;
+      padding: 14px;
       border-radius: 18px;
+      margin-top: 18px;
       font-size: 14px;
     }
-
     .summary-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-
     .strong span:last-child {
       font-weight: bold;
     }
   </style>
 </head>
+
 <body>
   <div class="calculator">
 
     <!-- Pantalla -->
     <div class="screen">
-      <div>
-        <div class="screen-title">Beneficio NETO</div>
-        <div id="screenMain" class="screen-main">0,00 €</div>
-      </div>
+      <div class="screen-title">Beneficio NETO</div>
+      <div id="screenMain" class="screen-main">0,00 €</div>
       <div id="screenSub" class="screen-sub">
-Completa los campos para calcular tu beneficio real como autónomo.
+Introduce los importes para calcular el rendimiento del trabajo.
       </div>
     </div>
 
     <!-- FACTURA -->
     <div class="section-title">Factura emitida</div>
+
     <div class="inputs">
       <div class="input-block full">
         <label>Base trabajo (€)</label>
-        <input type="number" id="baseTrabajo" placeholder="0,00" />
+        <input type="text" inputmode="decimal" pattern="[0-9]*" id="baseTrabajo" placeholder="0,00" />
       </div>
 
       <div class="input-block">
         <label>IVA (%)</label>
-        <input type="number" id="ivaTrabajo" placeholder="21" />
+        <input type="text" inputmode="decimal" pattern="[0-9]*" id="ivaTrabajo" placeholder="21" />
       </div>
 
       <div class="input-block">
         <label>IRPF (%)</label>
-        <input type="number" id="irpfTrabajo" placeholder="15" />
+        <input type="text" inputmode="decimal" pattern="[0-9]*" id="irpfTrabajo" placeholder="15" />
       </div>
     </div>
 
@@ -218,24 +203,23 @@ Completa los campos para calcular tu beneficio real como autónomo.
 
     <button class="add-btn" id="addGastoBtn">+ Añadir gasto</button>
 
-    <!-- BOTONES -->
+    <!-- Botones -->
     <div class="keypad-row">
       <button class="btn btn-light" id="btnLimpiar">BORRAR</button>
-      <button class="btn btn-dark" id="btnCalcular">NETO</button>
+      <button class="btn btn-accent" id="btnCalcular">NETO</button>
     </div>
 
-    <!-- RESUMEN -->
+    <!-- Resumen -->
     <div class="summary">
-      <div class="summary-row"><span>Ingresos netos factura:</span> <span id="resIngresos">0,00 €</span></div>
-      <div class="summary-row"><span>Total gastos:</span> <span id="resGastosTotales">0,00 €</span></div>
-      <div class="summary-row strong"><span>Beneficio NETO:</span> <span id="resBeneficio">0,00 €</span></div>
+      <div class="summary-row strong"><span>Beneficio BRUTO (sin gastos):</span> <span id="resBruto">0,00 €</span></div>
+      <div class="summary-row strong"><span>Beneficio NETO (tras gastos):</span> <span id="resNeto">0,00 €</span></div>
     </div>
 
   </div>
 
 <script>
 function toNumber(v) { return parseFloat(v.replace(",", ".")) || 0; }
-function euro(v) { return v.toLocaleString("es-ES", { minimumFractionDigits: 2 }) + " €"; }
+function euro(v) { return v.toLocaleString("es-ES",{minimumFractionDigits:2})+" €"; }
 
 let gastoIndex = 0;
 
@@ -245,22 +229,19 @@ function addGasto() {
 
   const div = document.createElement("div");
   div.className = "dynamic-gasto";
-  div.dataset.index = gastoIndex;
-
   div.innerHTML = `
     <div class="dynamic-gasto-title">Gasto ${gastoIndex}</div>
     <label>Base (€)</label>
-    <input type="number" class="gasto-base" placeholder="0,00">
-
+    <input type="text" inputmode="decimal" pattern="[0-9]*" class="gasto-base" placeholder="0,00">
     <label>IVA (%)</label>
-    <input type="number" class="gasto-iva" placeholder="21">
+    <input type="text" inputmode="decimal" pattern="[0-9]*" class="gasto-iva" placeholder="21">
   `;
 
-  document.getElementById("gastosContainer").appendChild(div);
+  gastosContainer.appendChild(div);
 }
 
-document.getElementById("addGastoBtn").onclick = addGasto;
-addGasto(); // añade uno por defecto
+addGasto();
+addGastoBtn.onclick = addGasto;
 
 // Cálculo principal
 function calcular() {
@@ -268,49 +249,44 @@ function calcular() {
   const iva = toNumber(ivaTrabajo.value);
   const irpf = toNumber(irpfTrabajo.value);
 
-  const ivaImporte = base * (iva / 100);
-  const irpfImporte = base * (irpf / 100);
+  const ingresosBrutos = base + base*(iva/100) - base*(irpf/100);
 
-  const ingresos = base + ivaImporte - irpfImporte;
-
-  // Calcular todos los gastos dinámicos
-  let gastosTotales = 0;
+  let gastos = 0;
   document.querySelectorAll(".dynamic-gasto").forEach(g => {
-    const baseG = toNumber(g.querySelector(".gasto-base").value);
-    const ivaG = toNumber(g.querySelector(".gasto-iva").value);
-    gastosTotales += baseG + baseG * (ivaG / 100);
+    const b = toNumber(g.querySelector(".gasto-base").value);
+    const i = toNumber(g.querySelector(".gasto-iva").value);
+    gastos += b + b*(i/100);
   });
 
-  const beneficio = ingresos - gastosTotales;
+  const beneficioBruto = ingresosBrutos;
+  const beneficioNeto = ingresosBrutos - gastos;
 
-  // Actualizar pantalla
-  screenMain.textContent = euro(beneficio);
-  screenSub.textContent =
-    "Ingresos factura: " + euro(ingresos) +
-    "\nGastos totales: " + euro(gastosTotales);
+  screenMain.textContent = euro(beneficioNeto);
+  screenSub.textContent = 
+      "Beneficio bruto: " + euro(beneficioBruto) +
+      "\nGastos totales: " + euro(gastos);
 
-  resIngresos.textContent = euro(ingresos);
-  resGastosTotales.textContent = euro(gastosTotales);
-  resBeneficio.textContent = euro(beneficio);
+  resBruto.textContent = euro(beneficioBruto);
+  resNeto.textContent = euro(beneficioNeto);
 }
 
 btnCalcular.onclick = calcular;
 
-// Borrar todo
+// Reset
 btnLimpiar.onclick = () => {
   baseTrabajo.value = "";
   ivaTrabajo.value = "";
   irpfTrabajo.value = "";
 
-  document.getElementById("gastosContainer").innerHTML = "";
+  gastosContainer.innerHTML = "";
   gastoIndex = 0;
   addGasto();
 
   screenMain.textContent = "0,00 €";
-  screenSub.textContent = "Completa los campos para calcular tu beneficio.";
-  resIngresos.textContent = "0,00 €";
-  resGastosTotales.textContent = "0,00 €";
-  resBeneficio.textContent = "0,00 €";
+  screenSub.textContent = "Introduce los importes para calcular el rendimiento del trabajo.";
+
+  resBruto.textContent = "0,00 €";
+  resNeto.textContent = "0,00 €";
 };
 </script>
 
