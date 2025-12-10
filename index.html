@@ -244,6 +244,22 @@
 
 <script>
 
+// Declaración de referencias correctas
+const baseTrabajo = document.getElementById("baseTrabajo");
+const ivaTrabajo = document.getElementById("ivaTrabajo");
+const irpfTrabajo = document.getElementById("irpfTrabajo");
+const addGastoBtn = document.getElementById("addGastoBtn");
+const gastosContainer = document.getElementById("gastosContainer");
+const btnCalcular = document.getElementById("btnCalcular");
+const btnLimpiar = document.getElementById("btnLimpiar");
+
+const screenTitle = document.getElementById("screenTitle");
+const screenMain = document.getElementById("screenMain");
+const screenSub = document.getElementById("screenSub");
+
+const resBruto = document.getElementById("resBruto");
+const resNeto = document.getElementById("resNeto");
+
 // Bloquear letras en todos los inputs
 document.addEventListener("input", e => {
   if (e.target.tagName === "INPUT") {
@@ -261,9 +277,10 @@ function euro(n) {
 
 let gastoIndex = 0;
 
-// Añadir gasto dinámico (solo gastos añadidos tienen botón eliminar)
+// Añadir gasto dinámico
 function addGasto() {
   gastoIndex++;
+
   const div = document.createElement("div");
   div.className = "dynamic-gasto";
 
@@ -290,14 +307,12 @@ function addGasto() {
   gastosContainer.appendChild(div);
 }
 
+addGastoBtn.onclick = addGasto;
+
 // Pantalla dinámica antes de pulsar NETO
 baseTrabajo.addEventListener("input", () => {
   const v = toNumber(baseTrabajo.value);
-  if (v === 0) {
-    screenMain.textContent = "0,00 €";
-  } else {
-    screenMain.textContent = euro(v);
-  }
+  screenMain.textContent = v ? euro(v) : "0,00 €";
   screenTitle.textContent = "Base del trabajo";
   screenSub.textContent = "Introduce el IVA, el IRPF y los gastos si los hay.";
 });
@@ -320,12 +335,12 @@ function calcular() {
   const beneficioBruto = ingresosBrutos;
   const beneficioNeto = ingresosBrutos - gastos;
 
-  // Cambiar pantalla cuando se pulsa NETO
+  // Actualizar pantalla
   screenTitle.textContent = "Beneficio NETO";
   screenMain.textContent = euro(beneficioNeto);
   screenSub.textContent =
-      "Beneficio bruto: " + euro(beneficioBruto) +
-      "\nGastos totales: " + euro(gastos);
+    "Beneficio bruto: " + euro(beneficioBruto) +
+    "\nGastos totales: " + euro(gastos);
 
   resBruto.textContent = euro(beneficioBruto);
   resNeto.textContent = euro(beneficioNeto);
@@ -333,7 +348,7 @@ function calcular() {
 
 btnCalcular.onclick = calcular;
 
-// RESET TOTAL – vacía todos los gastos
+// RESET TOTAL
 btnLimpiar.onclick = () => {
   baseTrabajo.value = "";
   ivaTrabajo.value = "";
@@ -342,7 +357,6 @@ btnLimpiar.onclick = () => {
   gastosContainer.innerHTML = "";
   gastoIndex = 0;
 
-  // No añadir ningún gasto hasta que el usuario pulse "Añadir gasto"
   screenTitle.textContent = "Base del trabajo";
   screenMain.textContent = "0,00 €";
   screenSub.textContent = "Introduce los importes para calcular tu beneficio real.";
