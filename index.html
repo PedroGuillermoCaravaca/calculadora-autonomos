@@ -25,6 +25,7 @@
       --btn-light: #a5a5a5;
       --btn-accent: #ff9f0a;
       --btn-danger: #ff3b30;
+      --btn-whatsapp: #25D366;
     }
 
     body.light {
@@ -217,7 +218,7 @@
       }
     }
 
-    /* Botones */
+    /* Botones principales */
     .keypad-row {
       display: grid;
       grid-template-columns: repeat(3,1fr);
@@ -255,6 +256,20 @@
 
     .strong span:last-child {
       font-weight: bold;
+    }
+
+    /* Botón WhatsApp */
+    .whatsapp-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: var(--btn-whatsapp);
+      color: #ffffff;
     }
   </style>
 </head>
@@ -314,29 +329,61 @@
       <span>Beneficio NETO (tras gastos):</span>
       <span id="resNeto">0,00 €</span>
     </div>
+
+    <hr style="border:none;border-top:1px solid #333;margin:8px 0;">
+
+    <div class="summary-row">
+      <span>IVA factura:</span>
+      <span id="resIvaFactura">0,00 €</span>
+    </div>
+    <div class="summary-row">
+      <span>IVA gastos deducible:</span>
+      <span id="resIvaGastos">0,00 €</span>
+    </div>
+    <div class="summary-row strong">
+      <span>IVA a ingresar Hacienda:</span>
+      <span id="resIvaHacienda">0,00 €</span>
+    </div>
+    <div class="summary-row">
+      <span>IRPF retenido en factura:</span>
+      <span id="resIrpfFactura">0,00 €</span>
+    </div>
+    <div class="summary-row strong">
+      <span>Total que va a Hacienda:</span>
+      <span id="resTotalHacienda">0,00 €</span>
+    </div>
   </div>
+
+  <button id="btnWhatsapp" class="whatsapp-btn">Enviar resumen por WhatsApp</button>
 
 </div>
 
 <script>
   // Referencias
-  const baseTrabajo    = document.getElementById("baseTrabajo");
-  const ivaTrabajo     = document.getElementById("ivaTrabajo");
-  const irpfTrabajo    = document.getElementById("irpfTrabajo");
-  const addGastoBtn    = document.getElementById("addGastoBtn");
-  const gastosContainer= document.getElementById("gastosContainer");
-  const btnCalcular    = document.getElementById("btnCalcular");
-  const btnLimpiar     = document.getElementById("btnLimpiar");
+  const baseTrabajo     = document.getElementById("baseTrabajo");
+  const ivaTrabajo      = document.getElementById("ivaTrabajo");
+  const irpfTrabajo     = document.getElementById("irpfTrabajo");
+  const addGastoBtn     = document.getElementById("addGastoBtn");
+  const gastosContainer = document.getElementById("gastosContainer");
+  const btnCalcular     = document.getElementById("btnCalcular");
+  const btnLimpiar      = document.getElementById("btnLimpiar");
+  const btnWhatsapp     = document.getElementById("btnWhatsapp");
 
-  const screenTitle    = document.getElementById("screenTitle");
-  const screenMain     = document.getElementById("screenMain");
-  const screenSub      = document.getElementById("screenSub");
+  const screenTitle     = document.getElementById("screenTitle");
+  const screenMain      = document.getElementById("screenMain");
+  const screenSub       = document.getElementById("screenSub");
 
-  const resBruto       = document.getElementById("resBruto");
-  const resNeto        = document.getElementById("resNeto");
+  const resBruto        = document.getElementById("resBruto");
+  const resNeto         = document.getElementById("resNeto");
 
-  const themeToggle    = document.getElementById("themeToggle");
-  const body           = document.body;
+  const resIvaFactura   = document.getElementById("resIvaFactura");
+  const resIvaGastos    = document.getElementById("resIvaGastos");
+  const resIvaHacienda  = document.getElementById("resIvaHacienda");
+  const resIrpfFactura  = document.getElementById("resIrpfFactura");
+  const resTotalHacienda= document.getElementById("resTotalHacienda");
+
+  const themeToggle     = document.getElementById("themeToggle");
+  const body            = document.body;
 
   // Tema claro/oscuro con icono como ACCIÓN (lo que va a pasar al pulsar)
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
@@ -416,20 +463,31 @@
   // Cálculo principal
   function calcular() {
     const base = toNumber(baseTrabajo.value);
-    const iva = toNumber(ivaTrabajo.value);
+    const iva  = toNumber(ivaTrabajo.value);
     const irpf = toNumber(irpfTrabajo.value);
 
-    const ingresosBrutos = base + base*(iva/100) - base*(irpf/100);
+    const ivaFactura = base * (iva / 100);
+    const irpfFactura = base * (irpf / 100);
+
+    const ingresosBrutos = base + ivaFactura - irpfFactura;
 
     let gastos = 0;
+    let ivaGastos = 0;
     document.querySelectorAll(".dynamic-gasto").forEach(g => {
       const b = toNumber(g.querySelector(".gasto-base").value);
       const i = toNumber(g.querySelector(".gasto-iva").value);
-      gastos += b + b*(i/100);
+      const ivaG = b * (i / 100);
+      gastos   += b + ivaG;
+      ivaGastos+= ivaG;
     });
 
     const beneficioBruto = ingresosBrutos;
     const beneficioNeto  = ingresosBrutos - gastos;
+
+    // IVA a ingresar: IVA factura - IVA soportado (si sale negativo, 0)
+    let ivaHacienda = ivaFactura - ivaGastos;
+    if (ivaHacienda < 0) ivaHacienda = 0;
+    const totalHacienda = ivaHacienda + irpfFactura;
 
     screenTitle.textContent = "Beneficio NETO";
     screenMain.textContent  = euro(beneficioNeto);
@@ -437,8 +495,13 @@
       "Beneficio bruto: " + euro(beneficioBruto) +
       "\nGastos totales: " + euro(gastos);
 
-    resBruto.textContent = euro(beneficioBruto);
-    resNeto.textContent  = euro(beneficioNeto);
+    resBruto.textContent        = euro(beneficioBruto);
+    resNeto.textContent         = euro(beneficioNeto);
+    resIvaFactura.textContent   = euro(ivaFactura);
+    resIvaGastos.textContent    = euro(ivaGastos);
+    resIvaHacienda.textContent  = euro(ivaHacienda);
+    resIrpfFactura.textContent  = euro(irpfFactura);
+    resTotalHacienda.textContent= euro(totalHacienda);
   }
 
   btnCalcular.addEventListener("click", calcular);
@@ -456,8 +519,36 @@
     screenMain.textContent  = "0,00 €";
     screenSub.textContent   = "Introduce los importes para calcular tu beneficio real.";
 
-    resBruto.textContent = "0,00 €";
-    resNeto.textContent  = "0,00 €";
+    resBruto.textContent         = "0,00 €";
+    resNeto.textContent          = "0,00 €";
+    resIvaFactura.textContent    = "0,00 €";
+    resIvaGastos.textContent     = "0,00 €";
+    resIvaHacienda.textContent   = "0,00 €";
+    resIrpfFactura.textContent   = "0,00 €";
+    resTotalHacienda.textContent = "0,00 €";
+  });
+
+  // Botón WhatsApp: abre conversación con texto del resumen
+  btnWhatsapp.addEventListener("click", () => {
+    const texto = `
+Resumen factura autónomos
+
+Base trabajo: ${baseTrabajo.value || "0"}
+IVA (%): ${ivaTrabajo.value || "0"}
+IRPF (%): ${irpfTrabajo.value || "0"}
+
+Beneficio BRUTO (sin gastos): ${resBruto.textContent}
+Beneficio NETO (tras gastos): ${resNeto.textContent}
+
+IVA factura: ${resIvaFactura.textContent}
+IVA gastos deducible: ${resIvaGastos.textContent}
+IVA a ingresar en Hacienda: ${resIvaHacienda.textContent}
+IRPF retenido en factura: ${resIrpfFactura.textContent}
+Total que va a Hacienda: ${resTotalHacienda.textContent}
+`.trim();
+
+    const url = "https://wa.me/?text=" + encodeURIComponent(texto);
+    window.open(url, "_blank");
   });
 </script>
 
