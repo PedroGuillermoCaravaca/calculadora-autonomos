@@ -3,12 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Calculadora Autónomos</title>
-
-  <!-- Vista móvil a pantalla completa -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
@@ -21,29 +16,31 @@
       --text-muted: #d4d4d4;
     }
 
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui; }
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        sans-serif;
+    }
 
     body {
       margin: 0;
-      background: #000;
-      height: 100vh;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2c2c2e 0, #000000 60%);
       display: flex;
-      justify-content: center;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 500px;
-      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-      display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: var(--text-main);
     }
 
     .calculator {
       width: 100%;
-      padding: 16px;
-      padding-bottom: 32px;
+      max-width: 420px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 32px;
+      padding: 16px 16px 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .screen {
@@ -57,192 +54,367 @@
       justify-content: space-between;
     }
 
+    .screen-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
     .screen-main {
       text-align: right;
-      font-size: 44px;
+      font-size: 32px;
       font-weight: 600;
+      margin-bottom: 4px;
       word-break: break-word;
     }
 
     .screen-sub {
       text-align: right;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
+      line-height: 1.4;
       white-space: pre-line;
     }
 
     .section-title {
       font-size: 14px;
       color: var(--text-muted);
-      margin: 10px 4px 6px;
+      margin: 8px 2px 4px;
     }
 
     .inputs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
+      margin-bottom: 8px;
     }
 
-    .input-block { grid-column: span 2; display: flex; flex-direction: column; }
-    .input-block.full { grid-column: span 4; }
+    .input-block {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-    label { font-size: 11px; color: var(--text-muted); }
+    .input-block.full {
+      grid-column: span 4;
+    }
+
+    label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
 
     input[type="number"] {
       width: 100%;
       padding: 6px 8px;
       border-radius: 14px;
-      background: #2c2c2e;
       border: none;
+      background: #2c2c2e;
       color: var(--text-main);
+      font-size: 14px;
       text-align: right;
-      font-size: 16px;
+      outline: none;
     }
 
-    .suffix { position: relative; }
+    input[type="number"]::placeholder {
+      color: #6b6b6e;
+    }
+
+    .suffix {
+      position: relative;
+    }
+
     .suffix span {
       position: absolute;
       right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 13px;
-      color: #86868b;
+      font-size: 11px;
+      color: #8e8e93;
+      pointer-events: none;
+    }
+
+    .suffix input {
+      padding-right: 24px;
     }
 
     .keypad-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 14px;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     .btn {
-      padding: 16px 0;
-      border-radius: 999px;
       border: none;
-      font-size: 20px;
-      cursor: pointer;
-      transition: 0.05s;
+      border-radius: 999px;
+      padding: 14px 0;
+      font-size: 18px;
       font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.05s ease, filter 0.05s ease;
+      color: var(--text-main);
     }
 
-    .btn-dark { background: var(--bg-key-dark); color: #fff; }
-    .btn-light { background: var(--bg-key-light); color: #000; }
-    .btn-accent { background: var(--bg-key-accent); color: #fff; }
-    .btn-wide { grid-column: span 2; }
+    .btn:active {
+      transform: scale(0.97);
+      filter: brightness(1.2);
+    }
 
-    .btn:active { transform: scale(0.96); filter: brightness(1.2); }
+    .btn-dark {
+      background: var(--bg-key-dark);
+    }
 
-    .summary { display: none; }
+    .btn-light {
+      background: var(--bg-key-light);
+      color: #000;
+    }
+
+    .btn-accent {
+      background: var(--bg-key-accent);
+    }
+
+    .btn-wide {
+      grid-column: span 2;
+    }
+
+    .summary {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: #1c1c1e;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .summary-row span:first-child {
+      color: var(--text-muted);
+    }
+
+    .summary-row.strong span:last-child {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    @media (max-width: 420px) {
+      .screen-main {
+        font-size: 26px;
+      }
+    }
   </style>
 </head>
-
 <body>
-  <div class="app-container">
-    <div class="calculator">
-
-      <div class="screen">
-        <div class="screen-main" id="screenMain">0,00 €</div>
-        <div class="screen-sub" id="screenSub">Introduce importes e impuestos.</div>
+  <div class="calculator">
+    <div class="screen">
+      <div>
+        <div class="screen-title">Calculadora de autónomos</div>
+        <div id="screenMain" class="screen-main">0,00 €</div>
       </div>
+      <div id="screenSub" class="screen-sub">
+Introduce un importe base, los impuestos y los gastos para ver el beneficio BRUTO y NETO.
+      </div>
+    </div>
 
-      <div class="section-title">Factura</div>
-      <div class="inputs">
-        <div class="input-block full">
-          <label>Base del trabajo</label>
-          <div class="suffix">
-            <input type="number" id="baseTrabajo" step="0.01" placeholder="0,00">
-            <span>€</span>
-          </div>
-        </div>
-
-        <div class="input-block">
-          <label>IVA</label>
-          <div class="suffix">
-            <input type="number" id="ivaTrabajo" step="0.01" placeholder="21">
-            <span>%</span>
-          </div>
-        </div>
-
-        <div class="input-block">
-          <label>IRPF</label>
-          <div class="suffix">
-            <input type="number" id="irpfTrabajo" step="0.01" placeholder="15">
-            <span>%</span>
-          </div>
+    <div class="section-title">Factura que emites</div>
+    <div class="inputs">
+      <div class="input-block full">
+        <label>Importe base del trabajo (sin IVA)</label>
+        <div class="suffix">
+          <input type="number" id="baseTrabajo" placeholder="0,00" step="0.01" min="0" />
+          <span>€</span>
         </div>
       </div>
 
-      <div class="section-title">Gastos</div>
-      <div class="inputs">
-        <div class="input-block full">
-          <label>Base gastos</label>
-          <div class="suffix">
-            <input type="number" id="baseGastos" step="0.01" placeholder="0,00">
-            <span>€</span>
-          </div>
-        </div>
-
-        <div class="input-block">
-          <label>IVA gastos</label>
-          <div class="suffix">
-            <input type="number" id="ivaGastos" step="0.01" placeholder="21">
-            <span>%</span>
-          </div>
+      <div class="input-block">
+        <label>IVA aplicado</label>
+        <div class="suffix">
+          <input type="number" id="ivaTrabajo" placeholder="21" step="0.01" min="0" />
+          <span>%</span>
         </div>
       </div>
 
-      <div class="keypad-row">
-        <button class="btn btn-light btn-wide" id="btnLimpiar">BORRAR</button>
-        <button class="btn btn-dark" id="btnBruto">BRUTO</button>
-        <button class="btn btn-accent" id="btnNeto">NETO</button>
+      <div class="input-block">
+        <label>IRPF retenido</label>
+        <div class="suffix">
+          <input type="number" id="irpfTrabajo" placeholder="15" step="0.01" min="0" />
+          <span>%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Gastos asociados a este trabajo</div>
+    <div class="inputs">
+      <div class="input-block full">
+        <label>Base de gastos (sin IVA)</label>
+        <div class="suffix">
+          <input type="number" id="baseGastos" placeholder="0,00" step="0.01" min="0" />
+          <span>€</span>
+        </div>
       </div>
 
+      <div class="input-block">
+        <label>IVA de los gastos</label>
+        <div class="suffix">
+          <input type="number" id="ivaGastos" placeholder="21" step="0.01" min="0" />
+          <span>%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="keypad-row">
+      <button class="btn btn-light btn-wide" id="btnLimpiar">BORRAR</button>
+      <button class="btn btn-dark" id="btnCalcular">NETO</button>
+      <button class="btn btn-accent" id="btnBruto">BRUTO</button>
+    </div>
+
+    <div class="summary" id="summaryBox">
+      <div class="summary-row">
+        <span>Base trabajo:</span>
+        <span id="resBaseTrabajo">0,00 €</span>
+      </div>
+      <div class="summary-row">
+        <span>IVA factura:</span>
+        <span id="resIvaTrabajo">0,00 €</span>
+      </div>
+      <div class="summary-row">
+        <span>IRPF factura:</span>
+        <span id="resIrpfTrabajo">0,00 €</span>
+      </div>
+      <div class="summary-row strong">
+        <span>Total factura (cliente):</span>
+        <span id="resTotalFactura">0,00 €</span>
+      </div>
+      <div class="summary-row strong">
+        <span>Neto que cobras (ingreso real):</span>
+        <span id="resNetoCobras">0,00 €</span>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #2c2c2e; margin: 6px 0;" />
+
+      <div class="summary-row">
+        <span>Base gastos:</span>
+        <span id="resBaseGastos">0,00 €</span>
+      </div>
+      <div class="summary-row">
+        <span>IVA gastos:</span>
+        <span id="resIvaGastos">0,00 €</span>
+      </div>
+      <div class="summary-row strong">
+        <span>Total gastos:</span>
+        <span id="resTotalGastos">0,00 €</span>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #2c2c2e; margin: 6px 0;" />
+
+      <div class="summary-row strong">
+        <span>Beneficio NETO (tras gastos):</span>
+        <span id="resBeneficioNeto">0,00 €</span>
+      </div>
+
+      <div class="summary-row strong">
+        <span>Beneficio BRUTO (sin gastos):</span>
+        <span id="resBeneficioBruto">0,00 €</span>
+      </div>
     </div>
   </div>
 
-<script>
-function num(v){ return isNaN(parseFloat(v)) ? 0 : parseFloat(v); }
-function eur(v){ return v.toLocaleString("es-ES",{minimumFractionDigits:2})+" €"; }
+  <script>
+    function toNumber(value) {
+      const n = parseFloat((value || "").replace(",", "."));
+      return isNaN(n) ? 0 : n;
+    }
 
-function calcular(bruto=false){
-  let base = num(baseTrabajo.value);
-  let iva = num(ivaTrabajo.value)/100;
-  let irpf = num(irpfTrabajo.value)/100;
+    function formatEuro(value) {
+      return value.toLocaleString("es-ES", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }) + " €";
+    }
 
-  let gastosBase = bruto?0:num(baseGastos.value);
-  let gastosIVA = bruto?0:(num(ivaGastos.value)/100);
+    function calcular(modo) {
+      const baseTrabajo = toNumber(baseTrabajoInput.value);
+      const ivaTrabajo = toNumber(ivaTrabajoInput.value);
+      const irpfTrabajo = toNumber(irpfTrabajoInput.value);
+      const baseGastos = toNumber(baseGastosInput.value);
+      const ivaGastos = toNumber(ivaGastosInput.value);
 
-  let ivaFactura = base * iva;
-  let irpfFactura = base * irpf;
+      const ivaFactura = baseTrabajo * (ivaTrabajo / 100);
+      const irpfFactura = baseTrabajo * (irpfTrabajo / 100);
+      const totalFactura = baseTrabajo + ivaFactura - irpfFactura;
+      const netoCobras = totalFactura;
 
-  let totalCliente = base + ivaFactura - irpfFactura;
-  let netoSinGastos = totalCliente;
-  let totalGastos = gastosBase + gastosBase*gastosIVA;
+      const ivaG = baseGastos * (ivaGastos / 100);
+      const totalGastos = baseGastos + ivaG;
 
-  let resultado = bruto ? netoSinGastos : (netoSinGastos - totalGastos);
+      const bruto = netoCobras;
+      const neto = bruto - totalGastos;
 
-  screenMain.textContent = eur(resultado);
+      resBaseTrabajo.textContent = formatEuro(baseTrabajo);
+      resIvaTrabajo.textContent = formatEuro(ivaFactura);
+      resIrpfTrabajo.textContent = formatEuro(irpfFactura);
+      resTotalFactura.textContent = formatEuro(totalFactura);
+      resNetoCobras.textContent = formatEuro(netoCobras);
 
-  screenSub.textContent = 
-    "Bruto: " + eur(netoSinGastos) +
-    "\nGastos: " + eur(totalGastos) +
-    "\nNeto: " + eur(netoSinGastos - totalGastos);
-}
+      resBaseGastos.textContent = formatEuro(baseGastos);
+      resIvaGastos.textContent = formatEuro(ivaG);
+      resTotalGastos.textContent = formatEuro(totalGastos);
 
-btnNeto.onclick = ()=>calcular(false);
-btnBruto.onclick = ()=>calcular(true);
+      resBeneficioBruto.textContent = formatEuro(bruto);
+      resBeneficioNeto.textContent = formatEuro(neto);
 
-btnLimpiar.onclick = ()=>{
-  baseTrabajo.value="";
-  ivaTrabajo.value="";
-  irpfTrabajo.value="";
-  baseGastos.value="";
-  ivaGastos.value="";
-  screenMain.textContent="0,00 €";
-  screenSub.textContent="Introduce importes e impuestos.";
-};
-</script>
+      if (modo === "NETO") {
+        screenMain.textContent = formatEuro(neto);
+        screenSub.textContent = "Modo NETO\nIngresos reales: " + formatEuro(netoCobras) + "\nGastos: " + formatEuro(totalGastos);
+      } else {
+        screenMain.textContent = formatEuro(bruto);
+        screenSub.textContent = "Modo BRUTO\nIngresos reales: " + formatEuro(netoCobras) + "\n(Sin descontar gastos)";
+      }
+    }
 
+    function limpiar() {
+      baseTrabajoInput.value = "";
+      ivaTrabajoInput.value = "";
+      irpfTrabajoInput.value = "";
+      baseGastosInput.value = "";
+      ivaGastosInput.value = "";
+      screenMain.textContent = "0,00 €";
+      screenSub.textContent = "Introduce los datos para calcular el beneficio.";
+      resBaseTrabajo.textContent =
+      resIvaTrabajo.textContent =
+      resIrpfTrabajo.textContent =
+      resTotalFactura.textContent =
+      resNetoCobras.textContent =
+      resBaseGastos.textContent =
+      resIvaGastos.textContent =
+      resTotalGastos.textContent =
+      resBeneficioBruto.textContent =
+      resBeneficioNeto.textContent = "0,00 €";
+    }
+
+    const baseTrabajoInput = document.getElementById("baseTrabajo");
+    const ivaTrabajoInput = document.getElementById("ivaTrabajo");
+    const irpfTrabajoInput = document.getElementById("irpfTrabajo");
+    const baseGastosInput = document.getElementById("baseGastos");
+    const ivaGastosInput = document.getElementById("ivaGastos");
+
+    baseTrabajoInput.addEventListener("input", () => calcular("NETO"));
+    ivaTrabajoInput.addEventListener("input", () => calcular("NETO"));
+    irpfTrabajoInput.addEventListener("input", () => calcular("NETO"));
+    baseGastosInput.addEventListener("input", () => calcular("NETO"));
+    ivaGastosInput.addEventListener("input", () => calcular("NETO"));
+
+    document.getElementById("btnCalcular").addEventListener("click", () => calcular("NETO"));
+    document.getElementById("btnBruto").addEventListener("click", () => calcular("BRUTO"));
+    document.getElementById("btnLimpiar").addEventListener("click", limpiar);
+  </script>
 </body>
 </html>
