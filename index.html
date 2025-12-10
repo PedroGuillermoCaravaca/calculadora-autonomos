@@ -46,17 +46,21 @@
       padding: 18px;
       margin-bottom: 20px;
     }
+
     .screen-title {
       font-size: 12px;
       color: var(--text-muted);
     }
+
     .screen-main {
       text-align: right;
       font-size: 42px;
       font-weight: bold;
       color: white;
       margin-top: 6px;
+      transition: all .2s ease;
     }
+
     .screen-sub {
       text-align: right;
       margin-top: 6px;
@@ -65,22 +69,25 @@
       white-space: pre-line;
     }
 
-    /* Inputs */
     .section-title {
       margin-top: 14px;
       font-size: 14px;
       color: var(--text-muted);
     }
+
+    /* Inputs */
     .inputs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
+
     .input-block {
       grid-column: span 2;
       display: flex;
       flex-direction: column;
     }
+
     .input-block.full {
       grid-column: span 4;
     }
@@ -143,6 +150,7 @@
       gap: 12px;
       margin-top: 20px;
     }
+
     .btn {
       padding: 16px 0;
       border-radius: 999px;
@@ -151,6 +159,7 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     .btn-light { background: var(--btn-light); color: black; }
     .btn-accent { background: var(--btn-accent); color: black; }
 
@@ -162,11 +171,13 @@
       margin-top: 18px;
       font-size: 14px;
     }
+
     .summary-row {
       display: flex;
       justify-content: space-between;
       margin-bottom: 6px;
     }
+
     .strong span:last-child {
       font-weight: bold;
     }
@@ -179,11 +190,9 @@
 
   <!-- Pantalla -->
   <div class="screen">
-    <div class="screen-title">Beneficio NETO</div>
+    <div class="screen-title" id="screenTitle">Base del trabajo</div>
     <div id="screenMain" class="screen-main">0,00 €</div>
-    <div id="screenSub" class="screen-sub">
-Introduce los importes para calcular tu beneficio real.
-    </div>
+    <div id="screenSub" class="screen-sub">Introduce los importes para calcular tu beneficio real.</div>
   </div>
 
   <!-- FACTURA -->
@@ -252,11 +261,13 @@ function euro(n) {
 
 let gastoIndex = 0;
 
-// Añadir gasto dinámico
+// Añadir gasto dinámico (solo gastos añadidos tienen botón eliminar)
 function addGasto() {
   gastoIndex++;
   const div = document.createElement("div");
   div.className = "dynamic-gasto";
+
+  const tieneEliminar = gastoIndex > 1;
 
   div.innerHTML = `
     <div class="dynamic-gasto-title">Gasto ${gastoIndex}</div>
@@ -266,19 +277,30 @@ function addGasto() {
     <label>IVA (%)</label>
     <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-iva" placeholder="21">
 
-    <button class="delete-btn">Eliminar gasto</button>
+    ${tieneEliminar ? `<button class="delete-btn">Eliminar gasto</button>` : ``}
   `;
 
-  div.querySelector(".delete-btn").onclick = () => {
-    div.remove();
-    calcular();
-  };
+  if (tieneEliminar) {
+    div.querySelector(".delete-btn").onclick = () => {
+      div.remove();
+      calcular();
+    };
+  }
 
   gastosContainer.appendChild(div);
 }
 
-addGasto();
-addGastoBtn.onclick = addGasto;
+// Pantalla dinámica antes de pulsar NETO
+baseTrabajo.addEventListener("input", () => {
+  const v = toNumber(baseTrabajo.value);
+  if (v === 0) {
+    screenMain.textContent = "0,00 €";
+  } else {
+    screenMain.textContent = euro(v);
+  }
+  screenTitle.textContent = "Base del trabajo";
+  screenSub.textContent = "Introduce el IVA, el IRPF y los gastos si los hay.";
+});
 
 // Cálculo principal
 function calcular() {
@@ -298,6 +320,8 @@ function calcular() {
   const beneficioBruto = ingresosBrutos;
   const beneficioNeto = ingresosBrutos - gastos;
 
+  // Cambiar pantalla cuando se pulsa NETO
+  screenTitle.textContent = "Beneficio NETO";
   screenMain.textContent = euro(beneficioNeto);
   screenSub.textContent =
       "Beneficio bruto: " + euro(beneficioBruto) +
@@ -309,7 +333,7 @@ function calcular() {
 
 btnCalcular.onclick = calcular;
 
-// Reset total
+// RESET TOTAL – vacía todos los gastos
 btnLimpiar.onclick = () => {
   baseTrabajo.value = "";
   ivaTrabajo.value = "";
@@ -317,8 +341,9 @@ btnLimpiar.onclick = () => {
 
   gastosContainer.innerHTML = "";
   gastoIndex = 0;
-  addGasto();
 
+  // No añadir ningún gasto hasta que el usuario pulse "Añadir gasto"
+  screenTitle.textContent = "Base del trabajo";
   screenMain.textContent = "0,00 €";
   screenSub.textContent = "Introduce los importes para calcular tu beneficio real.";
 
