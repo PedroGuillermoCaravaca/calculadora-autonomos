@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Calculadora Autónomos</title>
 
@@ -9,9 +9,6 @@
 <link rel="icon" sizes="192x192" href="icon-192.png">
 
 <style>
-/* ---------------------- */
-/* --- ESTILOS GLOBALES --- */
-/* ---------------------- */
 :root{
   --accent: #ff9f0a;
   --danger: #ff3b30;
@@ -26,6 +23,8 @@
   --input-light: #e5e5ea;
 }
 
+/* Base */
+* { box-sizing: border-box; } /* seguro global, evita cualquier overflow */
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui;
@@ -35,7 +34,6 @@ body{
   display:flex;
   justify-content:center;
 }
-
 body.light{
   background:var(--bg-light);
   color:var(--text-light);
@@ -50,6 +48,11 @@ body.light{
 }
 body.light .calculator{
   background:var(--panel-light);
+}
+
+/* Asegurar box-sizing dentro del panel por si hay estilos específicos */
+.calculator * {
+  box-sizing: border-box;
 }
 
 /* Pantalla */
@@ -80,22 +83,22 @@ label{
   margin-top:12px;
   display:block;
 }
-input{
+input[type="text"], input[type="tel"], input[type="number"]{
   width:100%;
-  padding:14px;
+  padding:10px 12px;          /* reducido para que no sobresalga */
   background:var(--input-dark);
   color:inherit;
   border:none;
-  border-radius:14px;
+  border-radius:12px;
   margin-top:6px;
-  font-size:18px;
+  font-size:16px;             /* restaurado al tamaño original */
   text-align:right;
 }
-body.light input{
+body.light input[type="text"], body.light input[type="tel"], body.light input[type="number"]{
   background:var(--input-light);
 }
 
-/* Botones */
+/* Botones principales */
 .btn-row{
   display:flex;
   gap:14px;
@@ -121,6 +124,12 @@ body.light input{
   background:var(--accent);
   color:#000;
   border-radius:999px;
+  width:64px;
+  height:64px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 /* Botón añadir gasto */
@@ -222,10 +231,10 @@ body.light .summary{
   align-items:center;
   padding:10px 0;
   font-size:17px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
+  border-bottom:1px solid rgba(255,255,255,0.06);
 }
 body.light .detail-row{
-  border-bottom:1px solid rgba(0,0,0,0.1);
+  border-bottom:1px solid rgba(0,0,0,0.08);
 }
 
 /* WhatsApp */
@@ -247,7 +256,7 @@ body.light .detail-row{
   position:absolute;
   top:12px;
   right:12px;
-  background:rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.12);
   border:none;
   width:38px;
   height:38px;
@@ -265,101 +274,89 @@ body.light .theme-toggle{
 <body class="dark">
 
 <div class="calculator">
-<button id="themeToggle" class="theme-toggle">☀︎</button>
+  <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">☀︎</button>
 
-<!-- Pantalla -->
-<div class="screen">
-  <div class="screen-main" id="screenMain">0,00 €</div>
-  <div class="screen-sub" id="screenSub">
-    Introduce los importes para calcular tu beneficio real.
-  </div>
-</div>
-
-<!-- Entradas -->
-<label>Base trabajo (€)</label>
-<input id="baseTrabajo" type="text" inputmode="decimal">
-
-<label>IVA (%)</label>
-<input id="ivaTrabajo" type="text" inputmode="decimal">
-
-<label>IRPF (%)</label>
-<input id="irpfTrabajo" type="text" inputmode="decimal">
-
-<h3 style="margin-top:20px;font-size:20px;">Gastos</h3>
-
-<div id="gastosContainer"></div>
-<button id="addGastoBtn" class="add-btn">+ Añadir gasto</button>
-
-<!-- Botones principales -->
-<div class="btn-row">
-  <button id="btnLimpiar" class="btn btn-light">BORRAR</button>
-  <button id="btnCalcular" class="btn btn-calc">CALCULAR</button>
-</div>
-
-<!-- Resumen -->
-<div class="summary">
-  <div class="summary-row"><span>Beneficio BRUTO:</span><span id="resBruto">0,00 €</span></div>
-  <div class="summary-row"><span>Beneficio NETO:</span><span id="resNeto">0,00 €</span></div>
-
-  <!-- Acordeón -->
-  <div class="accordion-header" id="accHeader">
-    Más detalles <span id="chev" class="chev">▾</span>
+  <!-- Pantalla -->
+  <div class="screen">
+    <div class="screen-main" id="screenMain">0,00 €</div>
+    <div class="screen-sub" id="screenSub">Introduce los importes para calcular tu beneficio real.</div>
   </div>
 
-  <div id="accBody" class="accordion-body">
+  <!-- Entradas -->
+  <label for="baseTrabajo">Base trabajo (€)</label>
+  <input id="baseTrabajo" type="text" inputmode="decimal" placeholder="0,00">
 
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkIvaFactura" checked> IVA factura</div>
-      <div id="resIvaFactura">0,00 €</div>
+  <label for="ivaTrabajo">IVA (%)</label>
+  <input id="ivaTrabajo" type="text" inputmode="decimal" placeholder="21">
+
+  <label for="irpfTrabajo">IRPF (%)</label>
+  <input id="irpfTrabajo" type="text" inputmode="decimal" placeholder="15">
+
+  <h3 style="margin-top:20px;font-size:20px;">Gastos</h3>
+
+  <div id="gastosContainer"></div>
+  <button id="addGastoBtn" class="add-btn">+ Añadir gasto</button>
+
+  <!-- Botones principales -->
+  <div class="btn-row" style="align-items:center;">
+    <button id="btnLimpiar" class="btn btn-light">BORRAR</button>
+    <!-- espacio fijo para mantener alta prioridad visual y forma redonda -->
+    <div style="width:64px;display:flex;align-items:center;justify-content:center;">
+      <button id="btnCalcular" class="btn btn-calc" title="Calcular">CALC</button>
     </div>
-
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkIvaGastos" checked> IVA gastos deducible</div>
-      <div id="resIvaGastos">0,00 €</div>
-    </div>
-
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkIvaHacienda" checked> IVA a ingresar Hacienda</div>
-      <div id="resIvaHacienda">0,00 €</div>
-    </div>
-
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkIrpfFactura" checked> IRPF factura</div>
-      <div id="resIrpfFactura">0,00 €</div>
-    </div>
-
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkIrpfGastos" checked> IRPF gastos</div>
-      <div id="resIrpfGastos">0,00 €</div>
-    </div>
-
-    <div class="detail-row">
-      <div><input type="checkbox" id="chkTotalHacienda" checked> Total que va a Hacienda</div>
-      <div id="resTotalHacienda">0,00 €</div>
-    </div>
-
   </div>
 
-  <button id="btnWhatsapp" class="whatsapp-btn">Enviar resumen por WhatsApp</button>
-</div>
+  <!-- Resumen -->
+  <div class="summary">
+    <div class="summary-row"><span>Beneficio BRUTO:</span><span id="resBruto">0,00 €</span></div>
+    <div class="summary-row"><span>Beneficio NETO:</span><span id="resNeto">0,00 €</span></div>
+
+    <!-- Acordeón -->
+    <div class="accordion-header" id="accHeader">Más detalles <span id="chev" class="chev">▾</span></div>
+
+    <div id="accBody" class="accordion-body">
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkIvaFactura" checked> IVA factura</div>
+        <div id="resIvaFactura">0,00 €</div>
+      </div>
+
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkIvaGastos" checked> IVA gastos deducible</div>
+        <div id="resIvaGastos">0,00 €</div>
+      </div>
+
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkIvaHacienda" checked> IVA a ingresar Hacienda</div>
+        <div id="resIvaHacienda">0,00 €</div>
+      </div>
+
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkIrpfFactura" checked> IRPF factura</div>
+        <div id="resIrpfFactura">0,00 €</div>
+      </div>
+
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkIrpfGastos" checked> IRPF gastos</div>
+        <div id="resIrpfGastos">0,00 €</div>
+      </div>
+
+      <div class="detail-row">
+        <div><input type="checkbox" id="chkTotalHacienda" checked> Total que va a Hacienda</div>
+        <div id="resTotalHacienda">0,00 €</div>
+      </div>
+    </div>
+
+    <button id="btnWhatsapp" class="whatsapp-btn">Enviar resumen por WhatsApp</button>
+  </div>
 
 </div>
 
 <script>
-/* ---------------------- */
-/* --- UTILIDADES --- */
-/* ---------------------- */
-function toNum(v){
-  if(!v) return 0;
-  return parseFloat(v.replace(",","."));
-}
-function euro(n){
-  return n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";
-}
+/* Utilidades */
+function toNum(v){ if(!v) return 0; return parseFloat(String(v).replace(",",".")||0); }
+function euro(n){ return Number(n||0).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €"; }
 
-/* ---------------------- */
-/* --- ELEMENTOS --- */
-/* ---------------------- */
+/* Elementos */
 const baseTrabajo = document.getElementById("baseTrabajo");
 const ivaTrabajo = document.getElementById("ivaTrabajo");
 const irpfTrabajo = document.getElementById("irpfTrabajo");
@@ -388,66 +385,71 @@ const chkIrpfFactura = document.getElementById("chkIrpfFactura");
 const chkIrpfGastos = document.getElementById("chkIrpfGastos");
 const chkTotalHacienda = document.getElementById("chkTotalHacienda");
 
-/* ---------------------- */
-/* --- ACORDEÓN --- */
-/* ---------------------- */
+/* Acordeón */
 const accHeader = document.getElementById("accHeader");
 const accBody = document.getElementById("accBody");
 const chev = document.getElementById("chev");
 let opened = false;
-
-accHeader.addEventListener("click",()=>{
+accHeader.addEventListener("click", ()=>{
   opened = !opened;
-  chev.classList.toggle("open",opened);
+  chev.classList.toggle("open", opened);
   if(opened){
     accBody.classList.add("open");
-    accBody.style.maxHeight = accBody.scrollHeight+"px";
+    accBody.style.maxHeight = accBody.scrollHeight + "px";
   } else {
     accBody.classList.remove("open");
     accBody.style.maxHeight = "0px";
   }
 });
 
-/* ---------------------- */
-/* --- TEMA --- */
-/* ---------------------- */
+/* Tema */
 const themeToggle = document.getElementById("themeToggle");
-themeToggle.addEventListener("click",()=>{
+themeToggle.addEventListener("click", ()=>{
   document.body.classList.toggle("light");
   themeToggle.textContent = document.body.classList.contains("light") ? "☾" : "☀︎";
 });
 
-/* ---------------------- */
-/* --- GASTOS --- */
-/* ---------------------- */
+/* Gastos */
 let gastoIndex = 0;
 function addGasto(){
   gastoIndex++;
   const div = document.createElement("div");
   div.className = "dynamic-gasto";
-
   div.innerHTML = `
     <div class="gasto-title">Gasto ${gastoIndex}</div>
     <label>Base (€)</label>
-    <input type="text" class="g-base" inputmode="decimal">
+    <input class="g-base" type="text" inputmode="decimal" placeholder="0,00">
 
     <label>IVA (%)</label>
-    <input type="text" class="g-iva" inputmode="decimal">
+    <input class="g-iva" type="text" inputmode="decimal" placeholder="21">
 
     <label>IRPF (%)</label>
-    <input type="text" class="g-irpf" inputmode="decimal">
+    <input class="g-irpf" type="text" inputmode="decimal" placeholder="15">
 
     <button class="delete-btn">Eliminar gasto</button>
   `;
+  const del = div.querySelector(".delete-btn");
+  del.addEventListener("click", ()=>{
+    div.remove();
+    calcular(); // recalcular cuando eliminas
+  });
 
-  div.querySelector(".delete-btn").onclick = ()=> div.remove();
   gastosContainer.appendChild(div);
-}
-addGastoBtn.onclick = addGasto;
 
-/* ---------------------- */
-/* --- CALCULAR --- */
-/* ---------------------- */
+  // Asegurar que el nuevo input se enfoque
+  const firstInput = div.querySelector(".g-base");
+  if(firstInput) firstInput.focus();
+}
+addGastoBtn.addEventListener("click", addGasto);
+
+/* Evitar introducir letras */
+document.addEventListener("input", (e)=>{
+  if(e.target && e.target.tagName === "INPUT"){
+    e.target.value = String(e.target.value).replace(/[^0-9,.\-]/g, "");
+  }
+});
+
+/* Calculo */
 function calcular(){
   const base = toNum(baseTrabajo.value);
   const iva = toNum(ivaTrabajo.value);
@@ -482,6 +484,7 @@ function calcular(){
 
   const totalHacienda = ivaHacienda + irpfFact + irpfGastoTotal;
 
+  // Actualizar pantallas y valores
   resBruto.textContent = euro(beneficioBruto);
   resNeto.textContent  = euro(beneficioNeto);
 
@@ -494,16 +497,13 @@ function calcular(){
 
   document.getElementById("screenMain").textContent = euro(beneficioNeto);
   document.getElementById("screenSub").textContent =
-    "Beneficio bruto: "+euro(beneficioBruto)+"\n"+
-    "Gastos totales: "+euro(totalGastos);
+    "Beneficio bruto: "+euro(beneficioBruto)+"\nGastos totales: "+euro(totalGastos);
 }
 
-btnCalcular.onclick = calcular;
+/* Botones */
+document.getElementById("btnCalcular").addEventListener("click", calcular);
 
-/* ---------------------- */
-/* --- BORRAR --- */
-/* ---------------------- */
-btnLimpiar.onclick = ()=>{
+document.getElementById("btnLimpiar").addEventListener("click", ()=>{
   baseTrabajo.value = "";
   ivaTrabajo.value = "";
   irpfTrabajo.value = "";
@@ -521,40 +521,45 @@ btnLimpiar.onclick = ()=>{
   resTotalHacienda.textContent = "0,00 €";
 
   document.getElementById("screenMain").textContent = "0,00 €";
-  document.getElementById("screenSub").textContent =
-    "Introduce los importes para calcular tu beneficio real.";
-};
+  document.getElementById("screenSub").textContent = "Introduce los importes para calcular tu beneficio real.";
+});
 
-/* ---------------------- */
-/* --- WHATSAPP --- */
-/* ---------------------- */
-btnWhatsapp.onclick = ()=>{
-  calcular(); // asegurar coherencia
+/* WhatsApp */
+btnWhatsapp.addEventListener("click", ()=>{
+  calcular();
 
   const base = toNum(baseTrabajo.value);
   const iva = ivaTrabajo.value || "0";
   const irpf = irpfTrabajo.value || "0";
 
-  const tf = base + toNum(resIvaFactura.textContent) - toNum(resIrpfFactura.textContent);
+  const ivaFacturaTxt = resIvaFactura.textContent;
+  const ivaGastosTxt = resIvaGastos.textContent;
+  const ivaHaciendaTxt = resIvaHacienda.textContent;
+  const irpfFacturaTxt = resIrpfFactura.textContent;
+  const irpfGastosTxt = resIrpfGastos.textContent;
+  const totalHaciendaTxt = resTotalHacienda.textContent;
+
+  const totalFactura = base + toNum(ivaFacturaTxt) - toNum(irpfFacturaTxt);
 
   let lines = [];
-  lines.push("Resumen Factura\n");
-  lines.push("Base Trabajo: "+euro(base));
-  lines.push("IVA (%): "+iva);
-  lines.push("IRPF (%): "+irpf);
-  lines.push("Total Importe Factura: "+euro(tf));
+  lines.push("Resumen Factura");
+  lines.push("");
+  lines.push("Base Trabajo: " + euro(base));
+  lines.push("IVA (%): " + iva);
+  lines.push("IRPF (%): " + irpf);
+  lines.push("Total Importe Factura: " + euro(totalFactura));
   lines.push("");
 
-  if(chkIvaFactura.checked)      lines.push("IVA Factura: " + resIvaFactura.textContent);
-  if(chkIvaGastos.checked)       lines.push("IVA gastos deducible: " + resIvaGastos.textContent);
-  if(chkIvaHacienda.checked)     lines.push("IVA a ingresar Hacienda: " + resIvaHacienda.textContent);
-  if(chkIrpfFactura.checked)     lines.push("IRPF factura: " + resIrpfFactura.textContent);
-  if(chkIrpfGastos.checked)      lines.push("IRPF gastos: " + resIrpfGastos.textContent);
-  if(chkTotalHacienda.checked)   lines.push("Total que va a Hacienda: " + resTotalHacienda.textContent);
+  if(chkIvaFactura.checked)    lines.push("IVA Factura (€): " + ivaFacturaTxt);
+  if(chkIvaGastos.checked)     lines.push("IVA gastos deducible: " + ivaGastosTxt);
+  if(chkIvaHacienda.checked)   lines.push("IVA a ingresar a Hacienda (€): " + ivaHaciendaTxt);
+  if(chkIrpfFactura.checked)   lines.push("IRPF Retenido en Factura (€): " + irpfFacturaTxt);
+  if(chkIrpfGastos.checked)    lines.push("IRPF retenido en gastos: " + irpfGastosTxt);
+  if(chkTotalHacienda.checked) lines.push("Total importe a Hacienda (€): " + totalHaciendaTxt);
 
-  const url = "https://wa.me/?text="+encodeURIComponent(lines.join("\n"));
-  window.open(url,"_blank");
-};
+  const url = "https://wa.me/?text=" + encodeURIComponent(lines.join("\n"));
+  window.open(url, "_blank");
+});
 </script>
 
 </body>
