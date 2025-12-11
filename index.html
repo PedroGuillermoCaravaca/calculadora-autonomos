@@ -103,7 +103,20 @@
     .box{width:18px;height:18px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,0.12)}
     .value{font-weight:700}
 
-    .whatsapp-btn{width:100%;background:var(--whatsapp);color:#fff;border:none;padding:12px;border-radius:12px;margin-top:10px;cursor:pointer;font-weight:800}
+    .whatsapp-btn{
+  width:100%;
+  background:var(--whatsapp);
+  color:#fff;
+  border:none;
+  padding:16px;               /* tamaño como antes */
+  border-radius:14px;         /* un poco más estilo iOS */
+  margin-top:14px;
+  cursor:pointer;
+  font-weight:800;
+  font-size:17px;             /* tamaño de letra grande como antes */
+  text-align:center;
+  display:block;
+}
     /* responsive tweaks */
     @media(min-width:720px){
       body{padding:40px}
