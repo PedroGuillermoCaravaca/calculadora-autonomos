@@ -290,7 +290,7 @@
   <div class="section-title">Factura emitida</div>
 
   <div class="inputs">
-    <div class="input-block full">
+    <div class="input-block.full">
       <label>Base trabajo (€)</label>
       <input type="text" inputmode="decimal" pattern="[0-9.,]*" id="baseTrabajo" placeholder="0,00">
     </div>
@@ -348,6 +348,10 @@
       <span>IRPF retenido en factura:</span>
       <span id="resIrpfFactura">0,00 €</span>
     </div>
+    <div class="summary-row">
+      <span>IRPF retenido en gastos:</span>
+      <span id="resIrpfGastos">0,00 €</span>
+    </div>
     <div class="summary-row strong">
       <span>Total que va a Hacienda:</span>
       <span id="resTotalHacienda">0,00 €</span>
@@ -380,6 +384,7 @@
   const resIvaGastos    = document.getElementById("resIvaGastos");
   const resIvaHacienda  = document.getElementById("resIvaHacienda");
   const resIrpfFactura  = document.getElementById("resIrpfFactura");
+  const resIrpfGastos   = document.getElementById("resIrpfGastos");
   const resTotalHacienda= document.getElementById("resTotalHacienda");
 
   const themeToggle     = document.getElementById("themeToggle");
@@ -425,7 +430,7 @@
 
   let gastoIndex = 0;
 
-  // Añadir gasto dinámico (desde Gasto 1 con botón eliminar)
+  // Añadir gasto dinámico (con IRPF)
   function addGasto() {
     gastoIndex++;
 
@@ -438,6 +443,8 @@
       <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-base" placeholder="0,00">
       <label>IVA (%)</label>
       <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-iva" placeholder="21">
+      <label>IRPF (%)</label>
+      <input type="text" inputmode="decimal" pattern="[0-9.,]*" class="gasto-irpf" placeholder="15">
       <button class="delete-btn">Eliminar gasto</button>
     `;
 
@@ -472,12 +479,19 @@
 
     let gastos = 0;
     let ivaGastos = 0;
+    let irpfGastos = 0;
+
     document.querySelectorAll(".dynamic-gasto").forEach(g => {
       const b = toNumber(g.querySelector(".gasto-base").value);
       const i = toNumber(g.querySelector(".gasto-iva").value);
+      const r = toNumber(g.querySelector(".gasto-irpf").value);
+
       const ivaG = b * (i / 100);
-      gastos   += b + ivaG;
-      ivaGastos+= ivaG;
+      const irpfG = b * (r / 100);
+
+      gastos    += b + ivaG;           // coste contable
+      ivaGastos += ivaG;               // IVA soportado deducible
+      irpfGastos+= irpfG;              // IRPF que ingresas a Hacienda por ese autónomo
     });
 
     const ingresosBrutos = totalFactura;
@@ -486,7 +500,8 @@
 
     let ivaHacienda = ivaFactura - ivaGastos;
     if (ivaHacienda < 0) ivaHacienda = 0;
-    const totalHacienda = ivaHacienda + irpfFactura;
+
+    const totalHacienda = ivaHacienda + irpfFactura + irpfGastos;
 
     screenTitle.textContent = "Beneficio NETO";
     screenMain.textContent  = euro(beneficioNeto);
@@ -500,6 +515,7 @@
     resIvaGastos.textContent     = euro(ivaGastos);
     resIvaHacienda.textContent   = euro(ivaHacienda);
     resIrpfFactura.textContent   = euro(irpfFactura);
+    resIrpfGastos.textContent    = euro(irpfGastos);
     resTotalHacienda.textContent = euro(totalHacienda);
   }
 
@@ -524,6 +540,7 @@
     resIvaGastos.textContent     = "0,00 €";
     resIvaHacienda.textContent   = "0,00 €";
     resIrpfFactura.textContent   = "0,00 €";
+    resIrpfGastos.textContent    = "0,00 €";
     resTotalHacienda.textContent = "0,00 €";
   });
 
